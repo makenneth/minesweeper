@@ -15,12 +15,12 @@ class Board
   def render
     puts "  #{(0..8).to_a.join(" ")}"
     grid.each_with_index do |row, i|
-      p "#{i} #{row.map{ |tile| tile.to_s }.join(" ")}"
+      puts "#{i} #{row.map{ |tile| tile.to_s }.join(" ")}"
     end
   end
 
   def solved?
-    grid.flatten.all? { |tile| tile.revealed || (tile.value == 'b') }
+    grid.flatten.all? { |tile| tile.revealed || tile.value == 'b' }
   end
 
   def lost?(coord)
@@ -28,22 +28,31 @@ class Board
   end
 
   def reveal_neighbor(row, col)
-     ((row - 1)..(row + 1)).each do |i|
-        ((col - 1)..(col + 1)).each do |j|
-           return if beyond_wall?(i) || beyond_wall?(j)
-           return if grid[i][j].value != 0 || grid[i][j].flagged || grid[i][j].revealed
+     return if beyond_wall?(row) || beyond_wall?(col) ||
+               grid[row][col].value != 0 || grid[row][col].flagged ||
+               grid[row][col].revealed
 
-           reveal_neighbor(i, j)
-        end
+     directions  = [[row - 1, col - 1], [row + 1, col + 1],
+            [row - 1, col + 1], [row + 1, col - 1],
+            [row - 1, col], [row, col - 1],
+            [row + 1, col], [row, col + 1]]
+
+     grid[row][col].reveal
+
+     directions.each do |direction|
+        reveal_neighbor(*direction)
      end
+
   end
 
   def reveal(coord)
-     self[coord].reveal
-
-     reveal_neighbor(*coord) if self[coord].value == 0
+     self[coord].value == 0 ? reveal_neighbor(*coord) : self[coord].reveal
   end
 
+  def flag(coord)
+     self[coord].set_flag
+  end
+  
   def size
      grid.length
   end

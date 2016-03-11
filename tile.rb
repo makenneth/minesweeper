@@ -10,11 +10,14 @@ class Tile
   def to_s
     return "f" if flagged
 
-    revealed ? value : " "
+    revealed ? value.to_s : " "
   end
 
   def reveal
-     revealed == true
+     @revealed = true
   end
 
+  def set_flag
+     @flagged = @flagged ? false : true
+  end
 end

@@ -16,14 +16,15 @@ class Game
 
          break if board.lost?(coord)
       end
-
-      board.solved? ? "You did it." : "You stepped on a bomb..."
+      board.render
+      p board.solved? ? "You did it." : "You stepped on a bomb..."
    end
 
    def get_play
       begin
          coord = player.get_play
-         valid_play?(*coord)
+         valid_play?(coord)
+         is_flagged?(coord)
       rescue Exception => e
          puts "Oh noes, #{e}"
       retry
@@ -32,8 +33,12 @@ class Game
       coord
    end
 
-   def valid_play?(row, col)
-      raise "Coordinate Error" unless [row, col].all? { |pos| pos.between?(0, board.size - 1) }
+   def valid_play?(coord)
+      raise "Coordinate Error" unless coord.all? { |pos| pos.between?(0, board.size - 1) }
+   end
+
+   def is_flagged?(coord)
+      raise "Flag Error" if board.is_flagged(coord)
    end
 
 end
