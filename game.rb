@@ -11,10 +11,11 @@ class Game
    def play
       until board.solved?
          board.render
-         coord = get_play
-         board.reveal(coord)
+         coord, what_to_do = get_play
 
-         break if board.lost?(coord)
+         what_to_do == "R" ? board.reveal(coord) : board.flag(coord)
+
+         break if board.lost?(coord) && !board.is_flagged?(coord)
       end
       board.render
       p board.solved? ? "You did it." : "You stepped on a bomb..."
@@ -23,14 +24,22 @@ class Game
    def get_play
       begin
          coord = player.get_play
+         what_to_do = player.deciding_move
+
          valid_play?(coord)
-         is_flagged?(coord)
+         valid_input?(what_to_do)
+
+         is_flagged?(coord) if what_to_do == "R"
       rescue Exception => e
          puts "Oh noes, #{e}"
       retry
       end
 
-      coord
+      return coord, what_to_do
+   end
+
+   def valid_input?(char)
+      raise "Input Error" unless char == "R" || char == "F"
    end
 
    def valid_play?(coord)
@@ -38,7 +47,8 @@ class Game
    end
 
    def is_flagged?(coord)
-      raise "Flag Error" if board.is_flagged(coord)
+      raise "Flag Error" if board.is_flagged?(coord)
+
    end
 
 end

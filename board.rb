@@ -52,13 +52,13 @@ class Board
   def flag(coord)
      self[coord].set_flag
   end
-  
+
   def size
      grid.length
   end
 
   def is_flagged?(coord)
-    grid[coord].flagged
+    self[coord].flagged
   end
 
 
