@@ -1,5 +1,7 @@
 require_relative "tile"
 require 'byebug'
+require 'colorize'
+
 class Board
   def self.empty_grid(size = 9)
     Array.new(size) { Array.new(size) }
@@ -7,7 +9,6 @@ class Board
 
   def initialize(grid = self.class.empty_grid)
     @grid = grid
-
     populate_bombs
     populate_safe
   end
@@ -15,8 +16,44 @@ class Board
   def render
     puts "  #{(0..8).to_a.join(" ")}"
     grid.each_with_index do |row, i|
-      puts "#{i} #{row.map{ |tile| tile.to_s }.join(" ")}"
+      puts "#{i} #{map_row(row).join(" ".colorize({background: :light_white}))}"
     end
+  end
+
+  def map_row(row)
+     row.map do |tile|
+        if tile.to_s == " "
+           tile.to_s.colorize({background: :light_white})
+        else
+           tile.to_s.colorize(color_of_tile(tile.to_s))
+        end
+     end
+  end
+
+  def color_of_tile(tile)
+     color = case tile
+     when "1"
+        :light_blue
+     when "2"
+        :light_green
+     when "3"
+        :light_red
+     when "4"
+        :blue
+     when "5"
+        :magenta
+     when "6"
+        :light_cyan
+     when "7"
+        :black
+     when "8"
+        :light_black
+     when "b"
+        :black
+     end
+
+
+     {background: :light_black, color: color, mode: :bold}
   end
 
   def solved?
@@ -25,24 +62,6 @@ class Board
 
   def lost?(coord)
     self[coord].value == 'b'
-  end
-
-  def reveal_neighbor(row, col)
-     return if beyond_wall?(row) || beyond_wall?(col) ||
-               grid[row][col].value != 0 || grid[row][col].flagged ||
-               grid[row][col].revealed
-
-     directions  = [[row - 1, col - 1], [row + 1, col + 1],
-            [row - 1, col + 1], [row + 1, col - 1],
-            [row - 1, col], [row, col - 1],
-            [row + 1, col], [row, col + 1]]
-
-     grid[row][col].reveal
-
-     directions.each do |direction|
-        reveal_neighbor(*direction)
-     end
-
   end
 
   def reveal(coord)
@@ -117,6 +136,24 @@ class Board
     end
 
     count
+  end
+
+  def reveal_neighbor(row, col)
+     return if beyond_wall?(row) || beyond_wall?(col) ||
+               grid[row][col].value != 0 || grid[row][col].flagged ||
+               grid[row][col].revealed
+
+     directions  = [[row - 1, col - 1], [row + 1, col + 1],
+            [row - 1, col + 1], [row + 1, col - 1],
+            [row - 1, col], [row, col - 1],
+            [row + 1, col], [row, col + 1]]
+
+     grid[row][col].reveal
+
+     directions.each do |direction|
+        reveal_neighbor(*direction)
+     end
+
   end
 
   def beyond_wall?(val)
