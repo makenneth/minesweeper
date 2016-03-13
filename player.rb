@@ -1,6 +1,10 @@
+require_relative 'cursorable'
 class Player
+   include Cursorable
+
    def initialize(name)
       @name = name
+      @cursor_pos = [0, 0]
    end
 
    def deciding_move
@@ -8,8 +12,8 @@ class Player
       gets.chomp
    end
 
-   def get_play
-      p "Please enter your play, (x, y)"
-      gets.chomp.split(",").map(&:to_i)
+   def get_move
+      p "Please use WASD, and press enter at location"
+      get_input
    end
 end

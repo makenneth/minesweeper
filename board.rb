@@ -1,59 +1,18 @@
 require_relative "tile"
 require 'byebug'
-require 'colorize'
 
 class Board
-  def self.empty_grid(size = 9)
+  attr_reader :grid
+
+  def self.empty_grid(size = 20)
     Array.new(size) { Array.new(size) }
   end
 
-  def initialize(grid = self.class.empty_grid)
+  def initialize(option={:easy=>true}, grid = self.class.empty_grid)
     @grid = grid
+    @modifier = option[:easy] ? 10 : option[:hard] ? 5 : 7.5
     populate_bombs
     populate_safe
-  end
-
-  def render
-    puts "  #{(0..8).to_a.join(" ")}"
-    grid.each_with_index do |row, i|
-      puts "#{i} #{map_row(row).join(" ".colorize({background: :light_white}))}"
-    end
-  end
-
-  def map_row(row)
-     row.map do |tile|
-        if tile.to_s == " "
-           tile.to_s.colorize({background: :light_white})
-        else
-           tile.to_s.colorize(color_of_tile(tile.to_s))
-        end
-     end
-  end
-
-  def color_of_tile(tile)
-     color = case tile
-     when "1"
-        :light_blue
-     when "2"
-        :light_green
-     when "3"
-        :light_red
-     when "4"
-        :blue
-     when "5"
-        :magenta
-     when "6"
-        :light_cyan
-     when "7"
-        :black
-     when "8"
-        :light_black
-     when "b"
-        :black
-     end
-
-
-     {background: :light_black, color: color, mode: :bold}
   end
 
   def solved?
@@ -80,9 +39,15 @@ class Board
     self[coord].flagged
   end
 
+  def within_bound?(coord)
+     coord.all? { |pos| pos.between?(0, size - 1) }
+  end
+
+  def valid_play?(coord)
+     raise "Coordinate Error" unless coord.all? { |pos| pos.between?(0, size - 1) }
+  end
 
   private
-  attr_reader :grid
 
   def [](pos)
     x, y = pos
@@ -95,7 +60,7 @@ class Board
   end
 
   def num_bombs
-    (grid.size * grid[0].size) / 10 + 1
+    (grid.size * grid[0].size) / @modifier + 1
   end
 
   def valid_bomb?(coord)
@@ -157,7 +122,7 @@ class Board
   end
 
   def beyond_wall?(val)
-     val < 0 || val > 8
+     val < 0 || val >= size
   end
 
 end
