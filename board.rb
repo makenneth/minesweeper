@@ -4,12 +4,12 @@ require 'byebug'
 class Board
   attr_reader :grid
 
-  def self.empty_grid(size = 20)
+  def self.empty_grid(size = 10)
     Array.new(size) { Array.new(size) }
   end
 
-  def initialize(option={:easy=>true}, grid = self.class.empty_grid)
-    @grid = grid
+  def initialize(option={:diff=>:easy, :size=>9})
+    @grid = self.class.empty_grid(option[:size])
     @modifier = option[:easy] ? 10 : option[:hard] ? 5 : 7.5
     populate_bombs
     populate_safe

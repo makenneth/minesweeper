@@ -49,10 +49,20 @@ private
 end
 
 if __FILE__ == $PROGRAM_NAME
-   difficulties = {:H=>:hard, :M=>:medium, :E=>:easy}
-   puts "What difficulty would you like to play in? E/M/H"
-   difficulty = {difficulties[gets.chomp.to_sym]=>true}
+   difficulties = {:H=>{
+                     :diff=>:hard,
+                     :size=>15},
+                   :M=>{
+                      :diff=>:medium,
+                      :size=>12},
+                   :E=>{
+                      :diff=>:easy,
+                      :size=>9}
+                   }
 
-   minesweeper = Game.new(Board.new(difficulty))
+   puts "What difficulty would you like to play in? E/M/H"
+   conditions = difficulties[gets.chomp.to_sym]
+
+   minesweeper = Game.new(Board.new(conditions))
    minesweeper.play
 end
