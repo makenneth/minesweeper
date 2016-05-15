@@ -40,8 +40,8 @@ class Game
       return coord, what_to_do
    end
 
-private
 
+  private
    def is_flagged?(coord)
       raise "Flag Error" if board.is_flagged?(coord)
    end
